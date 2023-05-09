@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct Student {
+    unsigned int id;
+    char name[50];
+    char faculty[50];
+    float rating;
+};
+
+struct Student *generate_students_array() {
+    struct Student *students = (struct Student *) malloc(sizeof(struct Student) * 10);
+    for (int i = 0; i < 10; i++) {
+        students[i].id = i + 1;
+        for (int j = 0; j < 10; j++) {
+            students[i].name[j] = rand() % 26 + 65;
+        }
+        students[i].name[10] = '\0';
+        for (int j = 0; j < 2; j++) {
+            if ((3 * i + 1) % 2 == 0) {
+                students[i].faculty[j] = 'I';
+            } else {
+                students[i].faculty[j] = 'G';
+            }
+        }
+        students[i].faculty[2] = '\0';
+        students[i].rating = (i * 19 + 3) % 5 + 1;
+    }
+    return students;
+}
+
+int main() {
+    srand(time(NULL));
+    FILE *students_file;
+    students_file = fopen("students.csv", "a");
+    struct Student *generated_students;
+    generated_students = generate_students_array();
+    for (int i = 0; i < 10; i++) {
+        fprintf(students_file, "%d,%s,%s,%.2f\n", generated_students[i].id, generated_students[i].name,
+                generated_students[i].faculty, generated_students[i].rating);
+    }
+    fclose(students_file);
+    students_file = fopen("students.csv", "r");
+    for (int i = 0; i < 10; i++) {
+        fscanf(students_file, "%d,%s,%s,%f", &generated_students[i].id, generated_students[i].name,
+               generated_students[i].faculty, &generated_students[i].rating);
+        printf("%d,%s,%s,%f\n", generated_students[i].id, generated_students[i].name,
+               generated_students[i].faculty, generated_students[i].rating);
+    }
+    fclose(students_file);
+    free(generated_students);
+    return EXIT_SUCCESS;
+}
